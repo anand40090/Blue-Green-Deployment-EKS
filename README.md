@@ -34,15 +34,22 @@ ________________________________________________________________________________
 
 #### Usefule Articles 
 
-[Kubernetes + EKS + Blue/Green Deployment](https://medium.com/@jerome.decoster/kubernetes-eks-blue-green-deployment-99d611c596ad)
-[Install Eksctl, Kubectl, AWS Cli](https://sunitabachhav2007.hashnode.dev/prometheus-and-grafana-dashboard-on-eks-cluster-using-helm-chart)
+1. [Kubernetes + EKS + Blue/Green Deployment](https://medium.com/@jerome.decoster/kubernetes-eks-blue-green-deployment-99d611c596ad)
+
+1. [Install Eksctl, Kubectl, AWS Cli](https://sunitabachhav2007.hashnode.dev/prometheus-and-grafana-dashboard-on-eks-cluster-using-helm-chart)
+   
+1. [Gir Repository](https://github.com/jeromedecoster/eks-blue-green.git)
+
+2. [Update Kubeconfig file](https://docs.aws.amazon.com/eks/latest/userguide/create-kubeconfig.html)
+
+3. [Install Terraform](https://www.linuxbuzz.com/install-terraform-on-ubuntu/)
 
 _________________________________________________________________________________________________________________________________
 
 #### High Level Steps 
 
 1. Create AWS EC2 Instance with approriate IAM role to have ful access of ECR, EKS, Administrator
-2. Install the required softares on the system
+2. Install the required softwares on the system - Dockerengine, Terraform, Eksctl, KubeCtl, AWS Cli, Git, NPM
 3. Configure the AWS user in the system with Admin rights, this user will interact for ECR & EKS cluster tasks
 4. Clone the git reposiroty
 5. Build the docker image of the project with version wise - 1.0.0, 1.1.0, as shown in the diagram above
@@ -55,7 +62,114 @@ ________________________________________________________________________________
 
 _________________________________________________________________________________________________________________________________
 
+### Lets begin with the LAB 
 
+#### 1. Install the required softwares
+
+**Let us get the installation done for AWS CLI 2**
+
+```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
+sudo apt install unzip
+unzip awscliv2.zip 
+sudo ./aws/install
+
+```
+- Output
+  
+  ![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/c958bb10-55d4-4f63-8df5-5241cc14106d)
+
+**Install and Setup Kubectl**
+
+```
+curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin
+kubectl version
+
+```
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/d752d1bb-032f-4e3e-a83e-45c1e7857cc9)
+
+**Install and Setup eksctl**
+
+```
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+
+sudo mv /tmp/eksctl /usr/local/bin
+
+eksctl version
+
+```
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/4fb9e8ec-9e7d-4b46-9541-498991a8ecd9)
+
+**Configure AWS Interactive Admin User**
+
+```
+aws configure
+```
+
+-Output 
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/af5dea05-dfa1-445e-ada1-37c2fb44fc7a)
+
+**Create AWS ECR**
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/8150f9e7-4f4c-4854-be6f-d124c18b0f17)
+
+**Create EKS Cluster**
+
+```
+eksctl create cluster --name eks-blue-green \
+--node-type t2.medium \
+--nodes 2 \
+--nodes-min 2 \
+--nodes-max 3 \
+--region ap-south-1 \
+--zones=ap-south-1a,ap-south-1b \
+--authenticator-role-arn=arn:aws:iam::XXXXXXXXXXXX:instance-profile/SSM-FullAccess \
+--auto-kubeconfig \
+--asg-access \
+--external-dns-access \
+--appmesh-access \
+--alb-ingress-access
+```
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/f1fbe0b1-a024-44e0-84b6-958554be12c4)
+
+**Install Terrafrom**
+
+```
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update
+sudo apt install terraform -y
+terraform version
+```
+- Output
+
+
+
+
+#### 2. Clone the Git Reposiroty once all the prerequsites softwares are installed on the system
+
+```
+# download the code
+git clone \
+    --depth 1 \
+    https://github.com/jeromedecoster/eks-blue-green.git \
+    /tmp/aws
+    
+# cd
+cd /tmp/aws
+```
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/beefc625-ce7b-421c-aede-ba9a2edeffcf)
 
 
 
