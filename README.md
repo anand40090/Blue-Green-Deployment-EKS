@@ -152,7 +152,7 @@ terraform version
 ```
 - Output
 
-
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/09994d5c-d812-4763-b5d1-0259710d41ee)
 
 
 #### 2. Clone the Git Reposiroty once all the prerequsites softwares are installed on the system
@@ -171,7 +171,35 @@ cd /tmp/aws
 
 ![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/beefc625-ce7b-421c-aede-ba9a2edeffcf)
 
+**To setup the project, run the following command :**
+```
+# npm install + terraform init + create ecr repository
+$ make setup
 
+```
+- Output
+
+  ![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/01e53da8-dd3a-4a46-bc16-2f4f5f15b25e)
+
+- Note:- Plase update the terraform version form the file ./infra/versions.tf, before running the above command.
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/8876e7ec-6d2e-466b-8f50-d76394f95d63)
+
+
+**Let’s run the website locally :**
+
+```
+make local-1.0.0
+```
+
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/1476f93c-0426-435f-9429-dff99bbc327d)
+
+
+- By opening the address http://localhost:3000 we can see the website :
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/96dfa094-4c24-4a3b-976a-377dac3ec250)
 
 
 
