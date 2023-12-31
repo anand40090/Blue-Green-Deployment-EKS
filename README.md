@@ -363,6 +363,8 @@ envsubst < service-green.yaml | kubectl apply --filename -
 ![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/f2e55dea-de9c-4b67-aa1d-5aeca6ad2814)
 
 
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/b60b4673-a726-4de1-af58-51ef6ebe8c30)
+
 
 
 
