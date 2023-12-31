@@ -305,5 +305,65 @@ $ make k8s-1.0.0
 ![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/86aeb4de-caab-483d-ac33-a4215b578b04)
 
 
+**Publish the version 1.1.0 as green**
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/9d6d99f1-065e-4933-a76d-cd71b8fb1b11)
+
+- We will now publish our version 1.1.0 in the « green space » :
+
+```
+make k8s-1.1.0-green
+export DOCKER_IMAGE=public.ecr.aws/m0v5l9b2/eks-blue-green:1.1.0
+export LABEL_VERSION=1-1-0
+envsubst < deployment.yaml | kubectl apply --filename -
+```
+
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/335f8c6c-1260-40cc-9221-45c97837891e)
+
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/fc12ed81-cab9-4ea1-a2f4-ac75a2ae8643)
+
+
+**Remove the 1.0.0 version**
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/dcd3025b-4187-45e6-9429-a8808376741a)
+
+> We no longer need our previous version, we can free up our resources.
+> That means :
+> Remove the parrot-1-0-0 deployment
+> Remove the parrot-green service
+
+- We run the following command :
+
+```
+# delete previous blue deployment + green service
+$ make k8s-delete-1.0.0
+```  
+> Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/012c8863-fcae-4726-9ed8-9ca1d240ae69)
+
+**Publish the version 1.2.0 as a new green**
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/8b36895e-f52a-466e-8de7-100338ab8f6d)
+
+> We will now publish our version 1.2.0 in the « green space » :
+
+```
+# publish the 1.2.0 version as green
+make k8s-1.2.0-green
+export DOCKER_IMAGE=public.ecr.aws/m0v5l9b2/eks-blue-green:1.2.0
+export LABEL_VERSION=1-2-0
+envsubst < service-green.yaml | kubectl apply --filename -
+```
+> Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/f2e55dea-de9c-4b67-aa1d-5aeca6ad2814)
+
+
+
+
 
 
