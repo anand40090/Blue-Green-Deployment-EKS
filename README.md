@@ -120,27 +120,6 @@ aws configure
 
 ![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/8150f9e7-4f4c-4854-be6f-d124c18b0f17)
 
-**Create EKS Cluster**
-
-```
-eksctl create cluster --name eks-blue-green \
---node-type t2.medium \
---nodes 2 \
---nodes-min 2 \
---nodes-max 3 \
---region ap-south-1 \
---zones=ap-south-1a,ap-south-1b \
---authenticator-role-arn=arn:aws:iam::XXXXXXXXXXXX:instance-profile/SSM-FullAccess \
---auto-kubeconfig \
---asg-access \
---external-dns-access \
---appmesh-access \
---alb-ingress-access
-```
-- Output
-
-![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/f1fbe0b1-a024-44e0-84b6-958554be12c4)
-
 **Install Terrafrom**
 
 ```
@@ -200,6 +179,130 @@ make local-1.0.0
 - By opening the address http://localhost:3000 we can see the website :
 
 ![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/96dfa094-4c24-4a3b-976a-377dac3ec250)
+
+
+**We can see the site in version 1.1.0 by executing this command :**
+
+```
+make local-1.1.0
+```
+
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/ea7e00df-7724-4558-b5fd-f5e2156b3865)
+
+
+**By reloading the website we can see :**
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/570ec4a2-cfe2-47db-965e-573a14e9ca6d)
+
+**And to see version 1.2.0 of the site :**
+
+```
+make local-1.2.0
+```
+
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/14e15920-06d3-4414-838d-46da4ae36a01)
+
+**By reloading the website we can see :**
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/d2340206-08b7-4d75-9053-1ccd2f5105ae)
+
+
+### 3. Building and push the Docker images
+
+**We will now create the 3 docker images with this command:**
+
+```
+# build all 1.x.0 versions
+$ make build-all
+```
+
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/efe4dccc-1a36-4009-8d5f-ffec66f8d4c6)
+
+
+**We can now push our 3 images on ECR :**
+
+```
+# push all 1.x.0 versions to ecr
+
+docker tag eks-blue-green:1.2.0 public.ecr.aws/m0v5l9b2/eks-blue-green:1.2.0
+docker tag eks-blue-green:1.1.0 public.ecr.aws/m0v5l9b2/eks-blue-green:1.1.0
+docker tag eks-blue-green:1.0.0 public.ecr.aws/m0v5l9b2/eks-blue-green:1.0.0
+docker push eks-blue-green:1.2.0 public.ecr.aws/m0v5l9b2/eks-blue-green:1.2.0
+docker push public.ecr.aws/m0v5l9b2/eks-blue-green:1.2.0
+docker push public.ecr.aws/m0v5l9b2/eks-blue-green:1.1.o
+docker push public.ecr.aws/m0v5l9b2/eks-blue-green:1.1.0
+docker push public.ecr.aws/m0v5l9b2/eks-blue-green:1.0.0
+
+```
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/4bf3362a-812c-4123-b6ea-ef48b66c884d)
+
+
+#### 3. Creating the EKS cluster
+
+**Create EKS Cluster**
+
+```
+eksctl create cluster --name eks-blue-green \
+--node-type t2.medium \
+--nodes 2 \
+--nodes-min 2 \
+--nodes-max 3 \
+--region ap-south-1 \
+--zones=ap-south-1a,ap-south-1b \
+--authenticator-role-arn=arn:aws:iam::XXXXXXXXXXXX:instance-profile/SSM-FullAccess \
+--auto-kubeconfig \
+--asg-access \
+--external-dns-access \
+--appmesh-access \
+--alb-ingress-access
+```
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/f1fbe0b1-a024-44e0-84b6-958554be12c4)
+
+
+**We can now correctly list the namespaces :**
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/c3971590-95ec-4446-878f-c6d066ecdaa5)
+
+**We use these templates. We create a namespace :**
+
+- CD to the K8s directory from the cloned repo folder
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/8aec4522-02c1-455d-b7bf-b876977968dc)
+
+```
+kubectl apply --filename namespace.yaml
+export DOCKER_IMAGE=xxxxx.dkr.ecr.eu-west-3.amazonaws.com/eks-blue-green:1.0.0
+export LABEL_VERSION=1-0-0
+```
+
+**Publish the version 1.0.0**
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/4dacabdd-828c-45e7-a6ce-5a2e2490e3f4)
+
+
+**To upload our first version we run this command :**
+
+```
+# publish the 1.0.0 version
+$ make k8s-1.0.0
+```
+
+- Output
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/a18ddf78-5709-4b80-a4d6-6ea647158ab8)
+
+
+![image](https://github.com/anand40090/Blue-Green-Deployment-EKS/assets/32446706/86aeb4de-caab-483d-ac33-a4215b578b04)
 
 
 
